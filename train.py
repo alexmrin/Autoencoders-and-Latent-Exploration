@@ -5,6 +5,8 @@ from torch.optim.lr_scheduler import ReduceLROnPlateau
 from torch.utils.tensorboard import SummaryWriter
 
 import vars as v
+import models
+from data import *
 import args
 from utils import visualize
 
@@ -70,3 +72,8 @@ def loop():
             f"{args.save_path}/model_weights.pt",
         )
         v.current_epoch += 1
+
+if __name__ == "__main__":
+    globals()[dataset_name]()
+    v.model = getattr(models, model_name)()
+    loop()

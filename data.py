@@ -6,7 +6,7 @@ import torchvision.transforms as transforms
 from torch.utils.data import DataLoader, random_split
 import numpy as np
 
-import cli
+from cli import *
 import vars as v
 import args
 

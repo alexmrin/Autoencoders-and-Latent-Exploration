@@ -69,3 +69,7 @@ class encoder(nn.Module):
 
     def forward(self, x):
         return self.encoder(x)
+    
+def conv_autoencoder():
+    model = autoencoder()
+    return model
