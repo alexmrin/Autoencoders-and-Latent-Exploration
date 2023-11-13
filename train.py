@@ -48,11 +48,11 @@ def test():
     v.writer.add_scalar("Validation Loss", total_loss, v.current_epoch)
 
     sample = next(iter(v.validloader))
-    input = sample[0][0].to(v.device)
+    input = sample[0][0].to(args.device)
     visualize(v.model(input), input)
 
 def loop():
-    v.model = v.model.to(v.device)
+    v.model = v.model.to(args.device)
     v.criterion = nn.MSELoss()
     v.current_epoch = 1
     v.optimizer = torch.optim.AdamW(filter(lambda p: p.requires_grad==True, v.model.parameters()), lr=args.learning_rate, weight_decay=args.weight_decay)

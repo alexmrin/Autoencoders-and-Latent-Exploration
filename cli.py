@@ -2,29 +2,29 @@ import argparse
 
 parser = argparse.ArgumentParser()
 parser.add_argument(
-    "d",
-    "dataset",
+    "-d",
+    "--dataset",
     type=str,
     required=True,
     help="Dataset name."
 )
 parser.add_argument(
-    "m",
-    "model",
+    "-m",
+    "--model",
     type=str,
     required=True,
     help="Model name."
 )
 parser.add_argument(
-    "p",
-    "path",
+    "-p",
+    "--path",
     type=str,
     required=False,
     help="Filepath of the state dicts."
 )
 parser.add_argument(
-    "t",
-    "tag",
+    "-t",
+    "--tag",
     type=str,
     required=True,
     help="Experiment tag name."
