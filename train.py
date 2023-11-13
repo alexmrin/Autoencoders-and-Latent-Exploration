@@ -48,7 +48,7 @@ def test():
     v.writer.add_scalar("Validation Loss", total_loss, v.current_epoch)
 
     sample = next(iter(v.validloader))
-    input = sample[0][0].to(args.device)
+    input = sample[0][0].view(1, 1, 28, 28).to(args.device)
     visualize(v.model(input), input)
 
 def loop():
