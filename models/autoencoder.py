@@ -10,25 +10,22 @@ class autoencoder(nn.Module):
             nn.BatchNorm1d(2),
             nn.Sigmoid()
         )
-        self.bottleneck2 = nn.Linear(2, 196)
         self.decoder = decoder()
 
     def forward(self, x):
         x = self.encoder(x)
         x = x.view(-1, 64)
         bottleneck = self.bottleneck1(x)
-        # Input in R2 -> 128 neurons to (4, 7, 7)
-        x = self.bottleneck2(bottleneck)
-        x = x.view(-1, 4, 7, 7)
         x = self.decoder(x)
         return x
     
 class decoder(nn.Module):
     def __init__(self, in_channels=4):
         super().__init__()
+        self.resize = nn.Linear(2, 196)
         self.decoder = nn.Sequential(
             nn.UpsamplingNearest2d(scale_factor=2),
-            nn.Conv2d(in_channels=4, out_channels=16, kernel_size=3, padding=1),
+            nn.Conv2d(in_channels=in_channels, out_channels=16, kernel_size=3, padding=1),
             nn.BatchNorm2d(16),
             nn.ReLU(inplace=True),
 
@@ -49,6 +46,10 @@ class decoder(nn.Module):
         )
 
     def forward(self, x):
+        # Input in R2 -> 128 neurons to (4, 7, 7)
+        x = self.resize(x)
+        x = x.view(-1, 4, 7, 7)
+
         return self.decoder(x)
 
 class encoder(nn.Module):
