@@ -16,7 +16,7 @@ class autoencoder(nn.Module):
         x = self.encoder(x)
         x = x.view(-1, 64)
         bottleneck = self.bottleneck1(x)
-        x = self.decoder(x)
+        x = self.decoder(bottleneck)
         return x
     
 class decoder(nn.Module):
