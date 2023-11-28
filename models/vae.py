@@ -6,8 +6,8 @@ class vae(nn.Module):
     # We want the bottleneck to be paramaterized by mean and logvariance
     def __init__(self):
         super().__init__()
-        self.encoder = encoder(latentdim=6)
-        self.decoder = decoder(latentdim=6)
+        self.encoder = encoder(latentdim=25)
+        self.decoder = decoder(latentdim=25)
 
     def sample(self, mean, logvar):
         variance = torch.exp(logvar)

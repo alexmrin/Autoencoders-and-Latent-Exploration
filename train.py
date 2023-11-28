@@ -1,5 +1,6 @@
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
 from tqdm import tqdm
 from torch.optim.lr_scheduler import ReduceLROnPlateau
 from torch.utils.tensorboard import SummaryWriter
@@ -10,12 +11,10 @@ from data import *
 import args
 from utils import visualize
 
+
 def vae_loss(preds, inputs, mean, logvar, MSE=True):
-    if MSE:
-        difference_loss = torch.nn.MSELoss(preds, inputs)
-    else:
-        difference_loss = torch.nn.BCELoss(preds, inputs)
-    KL_divergence = torch.sum(-.5 + logvar**2 - mean**2 - torch.exp(logvar)**2)
+    difference_loss = F.mse_loss(preds, inputs, reduction='sum')
+    KL_divergence = -.5 * torch.sum(1 + logvar - mean**2 - torch.exp(logvar))
     return difference_loss + KL_divergence
 
 def train():
@@ -57,7 +56,7 @@ def test():
 
     sample = next(iter(v.validloader))
     input = sample[0][0].view(1, 1, 28, 28).to(args.device)
-    visualize(v.model(input), input)
+    visualize(v.model(input)[0], input)
 
 def loop():
     v.model = v.model.to(args.device)
