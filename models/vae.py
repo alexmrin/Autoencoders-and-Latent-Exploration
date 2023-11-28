@@ -19,7 +19,7 @@ class vae(nn.Module):
         mean, logvar = self.encoder(x)
         vector = self.sample(mean, logvar)
         output = self.decoder(vector)
-        return output
+        return output, mean, logvar
 
 
 class encoder(nn.Module):

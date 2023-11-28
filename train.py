@@ -25,8 +25,8 @@ def train():
     for inputs, labels in v.trainloader:
         inputs = inputs.to(args.device)
         v.optimizer.zero_grad()
-        preds = v.model(inputs)
-        loss = v.criterion(preds, inputs)
+        preds, mean, logvar = v.model(inputs)
+        loss = v.criterion(preds, inputs, mean, logvar)
         loss.backward()
         total_loss += loss.item()
         v.optimizer.step()
@@ -44,8 +44,8 @@ def test():
     with torch.no_grad():
         for inputs, labels in v.validloader:
             inputs = inputs.to(args.device)
-            preds = v.model(inputs)
-            loss = v.criterion(preds, inputs)
+            preds, mean, logvar = v.model(inputs)
+            loss = v.criterion(preds, inputs, mean, logvar)
             total_loss += loss.item()
 
             t.update(1)
