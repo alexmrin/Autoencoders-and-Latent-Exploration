@@ -10,6 +10,14 @@ from data import *
 import args
 from utils import visualize
 
+def vae_loss(preds, inputs, mean, logvar, MSE=True):
+    if MSE:
+        difference_loss = torch.nn.MSELoss(preds, inputs)
+    else:
+        difference_loss = torch.nn.BCELoss(preds, inputs)
+    KL_divergence = torch.sum(-.5 + logvar**2 - mean**2 - torch.exp(logvar)**2)
+    return difference_loss + KL_divergence
+
 def train():
     v.model.train()
     total_loss = 0.0
@@ -53,7 +61,8 @@ def test():
 
 def loop():
     v.model = v.model.to(args.device)
-    v.criterion = nn.MSELoss()
+    #v.criterion = nn.MSELoss()
+    v.criterion = vae_loss
     v.current_epoch = 1
     v.optimizer = torch.optim.AdamW(filter(lambda p: p.requires_grad==True, v.model.parameters()), lr=args.learning_rate, weight_decay=args.weight_decay)
     v.lr_scheduler = ReduceLROnPlateau(v.optimizer, mode='min', factor=0.1, patience=10)

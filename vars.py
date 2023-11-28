@@ -7,7 +7,7 @@ from torch.utils.tensorboard import SummaryWriter
 
 model: Optional[torch.nn.Module] = None
 optimizer: Optional[torch.optim.Optimizer] = None
-criterion: Optional[torch.nn.modules.loss._Loss] = None
+criterion = None
 trainloader: Optional[DataLoader] = None
 validloader: Optional[DataLoader] = None
 testloader: Optional[DataLoader] = None

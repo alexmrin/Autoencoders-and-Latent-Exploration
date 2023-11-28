@@ -7,7 +7,7 @@ class vae(nn.Module):
     def __init__(self):
         super().__init__()
         self.encoder = encoder(latentdim=6)
-        self.decoder = decoder()
+        self.decoder = decoder(latentdim=6)
 
     def sample(self, mean, logvar):
         variance = torch.exp(logvar)
@@ -48,12 +48,13 @@ class encoder(nn.Module):
 
     def forward(self, x):
         x = self.encoder(x)
+        x = x.view(-1, 64)
         mean = self.linearMean(x)
         logvar = self.linearLogvar(x)
         return mean, logvar
 
 class decoder(nn.Module):
-    def __init__(self, latentdim):
+    def __init__(self, latentdim=2):
         super().__init__()
         self.process = nn.Linear(latentdim, 49)
         self.decoder = nn.Sequential(
