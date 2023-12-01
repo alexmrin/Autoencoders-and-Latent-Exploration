@@ -6,8 +6,8 @@ class vae(nn.Module):
     # We want the bottleneck to be paramaterized by mean and logvariance
     def __init__(self):
         super().__init__()
-        self.encoder = encoder(latentdim=25)
-        self.decoder = decoder(latentdim=25)
+        self.encoder = encoder(latentdim=20)
+        self.decoder = decoder(latentdim=20)
 
     def sample(self, mean, logvar):
         variance = torch.exp(logvar)
@@ -16,6 +16,7 @@ class vae(nn.Module):
         return sample
 
     def forward(self, x):
+        x = x.view(-1, 784)
         mean, logvar = self.encoder(x)
         vector = self.sample(mean, logvar)
         output = self.decoder(vector)
@@ -27,28 +28,18 @@ class encoder(nn.Module):
         # returns tuple (mean, logvar)
         super().__init__()
         self.encoder = nn.Sequential(
-            nn.Conv2d(in_channels=in_channels, out_channels=16, kernel_size=3, padding=1),
-            nn.BatchNorm2d(16),
-            nn.ReLU(inplace=True),
-            nn.MaxPool2d(2),
-
-            nn.Conv2d(in_channels=16, out_channels=32, kernel_size=3, padding=1),
-            nn.BatchNorm2d(32),
-            nn.ReLU(inplace=True),
-            nn.MaxPool2d(2),
-
-            nn.Conv2d(in_channels=32, out_channels=64, kernel_size=3, padding=1),
-            nn.BatchNorm2d(64),
-            nn.ReLU(inplace=True),
-
-            nn.AdaptiveAvgPool2d((1, 1)),
+            nn.Linear(in_channels, 32),
+            nn.BatchNorm1d(),
+            nn.ReLU(),
+            nn.Linear(32, 64),
+            nn.BatchNorm1d(),
+            nn.ReLU(),
         )
         self.linearMean = nn.Linear(64, latentdim)
         self.linearLogvar = nn.Linear(64, latentdim)
 
     def forward(self, x):
         x = self.encoder(x)
-        x = x.view(-1, 64)
         mean = self.linearMean(x)
         logvar = self.linearLogvar(x)
         return mean, logvar
@@ -56,33 +47,20 @@ class encoder(nn.Module):
 class decoder(nn.Module):
     def __init__(self, latentdim=2):
         super().__init__()
-        self.process = nn.Linear(latentdim, 49)
         self.decoder = nn.Sequential(
-            nn.UpsamplingNearest2d(scale_factor=2),
-            nn.Conv2d(in_channels=1, out_channels=16, kernel_size=3, padding=1),
-            nn.BatchNorm2d(16),
-            nn.ReLU(inplace=True),
+            nn.Linear(latentdim, 32),
+            nn.BatchNorm1d(),
+            nn.ReLU(),
+            nn.Linear(32, 64),
+            nn.BatchNorm1d(),
+            nn.ReLU(),
 
-            nn.Conv2d(in_channels=16, out_channels=32, kernel_size=3, padding=1),
-            nn.BatchNorm2d(32),
-            nn.ReLU(inplace=True),
-
-            nn.UpsamplingNearest2d(scale_factor=2),
-            nn.Conv2d(in_channels=32, out_channels=32, kernel_size=3, padding=1),
-            nn.BatchNorm2d(32),
-            nn.ReLU(inplace=True),
-
-            nn.Conv2d(in_channels=32, out_channels=32, kernel_size=3, padding=1),
-            nn.BatchNorm2d(32),
-            nn.ReLU(inplace=True),
-
-            nn.Conv2d(in_channels=32, out_channels=1, kernel_size=3, padding=1),
+            nn.Linear(64, 784)
         )
 
     def forward(self, x):
-        x = self.process(x)
-        x = x.view(-1, 1, 7, 7)
         x = self.decoder(x)
+        x = x.view(-1, 1, 28, 28)
         return x
 
 def conv_vae():
